@@ -1,0 +1,26 @@
+name = "maccy-relay"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
+
+# 自定义域名:绑定为 Custom Domain(该域名的 zone 需在同一 Cloudflare 账户)。
+# 出于隐私,仓库不写入真实域名。部署时二选一:
+#   A) 在 Cloudflare Dashboard → Workers → 本 Worker → Settings → Domains & Routes
+#      → Add Custom Domain 添加你自己的域名(无需改本文件);
+#   B) 取消下面注释,把 clip.example.com 换成你自己的域名后再 `npm run deploy`。
+#      custom_domain 的 pattern 是整个主机名(不含路径);Worker 内部再按 /ws 路由。
+# [[routes]]
+# pattern = "clip.example.com"
+# custom_domain = true
+
+[observability.logs]
+enabled = true
+invocation_logs = true
