@@ -1,4 +1,4 @@
-# maccy-relay-server
+# cf-relay-worker
 
 零存储、端到端加密无感知的 Cloudflare 中继服务器（Worker + Durable Object）。
 
@@ -14,8 +14,7 @@
 - 只发送 text frame，单条 ≤ 900 KB，≤ 20 条/秒，每个房间 ≤ 8 条连接
 - 客户端自行协商 `rid` 并自行完成加解密
 
-它最初是为 [Maccy](https://github.com/p0deje/Maccy) 的跨设备剪贴板同步写的，
-但那只是它的第一个客户端。能力边界（由设计决定，不是实现缺陷）：
+它是一个通用的加密广播通道，不绑定任何特定应用。能力边界（由设计决定，不是实现缺陷）：
 
 - **纯广播**：消息会发给房间内除自己外的所有连接，无法定向发送给某一方
 - **无离线投递**：零存储，不在线的客户端收不到
@@ -36,7 +35,7 @@ npm run gen:vectors    # 重新生成 test-vectors/vectors.json
 
 1. `npx wrangler login`（登录托管你的域名的 Cloudflare 账户）
 2. `npm run deploy`
-3. Cloudflare Dashboard → Workers → maccy-relay → Settings → Domains & Routes
+3. Cloudflare Dashboard → Workers → cf-relay-worker → Settings → Domains & Routes
    → Add Custom Domain → 输入 `clip.example.com`（该域名已托管在本账户，自动签发证书）
    （或改用 `wrangler.toml` 里注释的 `[[routes]]` 模板，填入你的域名后再部署）
 4. 验证：`wss://clip.example.com/ws?rid=<64hex>` 可建立 WebSocket。

@@ -1,4 +1,4 @@
-name = "maccy-relay"
+name = "cf-relay-worker"
 main = "src/index.ts"
 compatibility_date = "2026-01-01"
 compatibility_flags = ["nodejs_compat"]

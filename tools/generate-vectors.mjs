@@ -2,9 +2,9 @@ import { createHash, createHmac, createCipheriv } from "node:crypto";
 import { argon2id } from "hash-wasm";
 import { writeFileSync, mkdirSync } from "node:fs";
 
-const KDF_SALT = "maccy-kdf-v1-salt";              // 17 字节
-const ROUTE_INFO = "maccy-route-v1";
-const KEY_INFO = "maccy-key-v1";
+const KDF_SALT = "e2e-sync-kdf-v1-salt";              // 17 字节
+const ROUTE_INFO = "e2e-sync-route-v1";
+const KEY_INFO = "e2e-sync-key-v1";
 const ARGON = { parallelism: 1, memoryKiB: 65536, iterations: 3, hashLength: 32 };
 
 function normalize(code) {
