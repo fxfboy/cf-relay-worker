@@ -21,6 +21,13 @@ new_sqlite_classes = ["Room"]
 # pattern = "clip.example.com"
 # custom_domain = true
 
+# 单条收到的 WebSocket 文本消息字节上限（十进制）。
+# 与代码默认值相同：33554432（32 MiB），对齐 Durable Objects 入站 WebSocket 上限
+# https://developers.cloudflare.com/durable-objects/platform/limits/ （2026-11-07，仅限制收到的消息）。
+# 可调低。大于 33554432 会在运行时被钳到该平台上限。空值或非正整数会回退到 33554432。
+[vars]
+MAX_MESSAGE_BYTES = "33554432"
+
 [observability.logs]
 enabled = true
 invocation_logs = true

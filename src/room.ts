@@ -1,7 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
-import { MAX_MESSAGE_BYTES, MAX_MSG_PER_SEC, atCapacity, byteLength, controlError } from "./protocol";
+import type { Env } from "./env";
+import { MAX_MSG_PER_SEC, atCapacity, byteLength, controlError, resolveMaxMessageBytes } from "./protocol";
 
-export class Room extends DurableObject {
+export class Room extends DurableObject<Env> {
   async fetch(request: Request): Promise<Response> {
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("expected websocket", { status: 426 });
@@ -22,7 +23,7 @@ export class Room extends DurableObject {
       ws.send(controlError("bad_request", "text frames only"));
       return;
     }
-    if (byteLength(message) > MAX_MESSAGE_BYTES) {
+    if (byteLength(message) > resolveMaxMessageBytes(this.env.MAX_MESSAGE_BYTES)) {
       ws.send(controlError("too_large"));
       return;
     }

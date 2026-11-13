@@ -1,15 +1,33 @@
 import { describe, it, expect } from "vitest";
 import {
-  MAX_MESSAGE_BYTES, MAX_MSG_PER_SEC, MAX_CONNECTIONS, PROTOCOL_VERSION,
-  controlError, byteLength, atCapacity,
+  CF_RECEIVED_WS_MESSAGE_BYTES, DEFAULT_MAX_MESSAGE_BYTES,
+  MAX_MSG_PER_SEC, MAX_CONNECTIONS, PROTOCOL_VERSION,
+  controlError, byteLength, atCapacity, resolveMaxMessageBytes,
 } from "../src/protocol";
 
 describe("protocol constants & helpers", () => {
   it("has spec-exact constants", () => {
-    expect(MAX_MESSAGE_BYTES).toBe(921600);
+    expect(CF_RECEIVED_WS_MESSAGE_BYTES).toBe(33_554_432);
+    expect(DEFAULT_MAX_MESSAGE_BYTES).toBe(CF_RECEIVED_WS_MESSAGE_BYTES);
     expect(MAX_MSG_PER_SEC).toBe(20);
     expect(MAX_CONNECTIONS).toBe(8);
     expect(PROTOCOL_VERSION).toBe(1);
+  });
+  it("resolves MAX_MESSAGE_BYTES with default, override, and platform clamp", () => {
+    expect(resolveMaxMessageBytes(undefined)).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("  ")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("0")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("-1")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("1024.5")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("1e3")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("abc")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("1024")).toBe(1024);
+    expect(resolveMaxMessageBytes(" 2048 ")).toBe(2048);
+    expect(resolveMaxMessageBytes("1")).toBe(1);
+    expect(resolveMaxMessageBytes("33554432")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("33554433")).toBe(33_554_432);
+    expect(resolveMaxMessageBytes("999999999999999999999")).toBe(33_554_432);
   });
   it("builds control error json", () => {
     expect(JSON.parse(controlError("too_large"))).toEqual({ control: "error", code: "too_large" });

@@ -1,11 +1,9 @@
+import type { Env } from "./env";
 import { isValidRoutingId } from "./rid";
 import { Room } from "./room";
 
+export type { Env };
 export { Room };
-
-export interface Env {
-  ROOM: DurableObjectNamespace<Room>;
-}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

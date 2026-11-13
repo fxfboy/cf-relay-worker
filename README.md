@@ -11,8 +11,10 @@
 设备间的加密广播通道：
 
 - 连接 `wss://<host>/ws?rid=<64 位小写 hex>`
-- 只发送 text frame，单条 ≤ 900 KB，≤ 20 条/秒，每个房间 ≤ 8 条连接
+- 只发送 text frame，单条 ≤ `MAX_MESSAGE_BYTES`（默认 32 MiB / 33554432 字节），≤ 20 条/秒，每个房间 ≤ 8 条连接
 - 客户端自行协商 `rid` 并自行完成加解密
+
+`MAX_MESSAGE_BYTES` 是十进制字节数，写在 `wrangler.toml` 的 `[vars]` 里。未设置或不是正整数时，默认 `33554432`（32 MiB），与 [Durable Objects 入站 WebSocket 消息上限](https://developers.cloudflare.com/durable-objects/platform/limits/) 一致（文档更新于 2026-11-07，只限制收到的消息）。配置大于该上限时会被钳到 `33554432`。要收紧单条消息，把这个变量改小即可。
 
 它是一个通用的加密广播通道，不绑定任何特定应用。能力边界（由设计决定，不是实现缺陷）：
 
