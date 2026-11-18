@@ -55,11 +55,7 @@ export class Room extends DurableObject<Env> {
   }
 
   webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
-    if (typeof message !== "string") {
-      this.reject(ws, "bad_request", "text frames only");
-      return;
-    }
-    const size = byteLength(message);
+    const size = typeof message === "string" ? byteLength(message) : message.byteLength;
     if (size > resolveMaxMessageBytes(this.env.MAX_MESSAGE_BYTES)) {
       this.reject(ws, "too_large");
       return;

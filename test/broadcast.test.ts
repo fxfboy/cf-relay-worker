@@ -1,6 +1,6 @@
 import { SELF } from "cloudflare:test";
 import { describe, it, expect } from "vitest";
-import { connect, connectJoining, nextMessage, relayHeaders } from "./ws";
+import { connect, connectJoining, nextBinaryMessage, nextMessage, relayHeaders } from "./ws";
 
 const RID = "b".repeat(64);
 
@@ -49,6 +49,21 @@ describe("room broadcast", () => {
     const received = nextMessage(b);
     a.send("hello");
     expect(await received).toBe("hello");
+    expect(gotBackToSender).toBe(false);
+  });
+
+  it("delivers binary frames to peers byte-for-byte, but not back to sender", async () => {
+    const a = await connect(RID);
+    const b = await connectJoining(RID, [a]);
+
+    let gotBackToSender = false;
+    a.addEventListener("message", () => { gotBackToSender = true; });
+
+    const received = nextBinaryMessage(b);
+    const payload = new Uint8Array([0, 1, 2, 253, 254, 255]);
+    a.send(payload.buffer);
+    const got = new Uint8Array(await received);
+    expect(got).toEqual(payload);
     expect(gotBackToSender).toBe(false);
   });
 

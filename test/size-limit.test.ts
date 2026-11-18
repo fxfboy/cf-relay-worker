@@ -46,18 +46,14 @@ describe("size limit", () => {
     expect(peerGot).toBe(false);
   });
 
-  it("rejects binary frames as bad_request and does not broadcast them", async () => {
+  it("rejects oversized binary frames with too_large and does not broadcast them", async () => {
     const a = await connect("2".repeat(64));
     const b = await connectJoining("2".repeat(64), [a]);
     let peerGot = false;
     b.addEventListener("message", () => { peerGot = true; });
     const reply = nextMessage(a);
-    a.send(new Uint8Array([1, 2, 3]).buffer);
-    expect(JSON.parse(await reply)).toEqual({
-      control: "error",
-      code: "bad_request",
-      detail: "text frames only",
-    });
+    a.send(new Uint8Array(LIMIT + 1).buffer);
+    expect(JSON.parse(await reply)).toEqual({ control: "error", code: "too_large" });
     await new Promise((r) => setTimeout(r, 50));
     expect(peerGot).toBe(false);
   });

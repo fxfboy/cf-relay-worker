@@ -38,11 +38,10 @@
 
 ### 数据帧与限额
 
-- 只接受 text frame，载荷对服务器是不透明的（不解析应用层信封）。二进制帧回
-  `{"control":"error","code":"bad_request"}`。
-- 单条 ≤ `MAX_MESSAGE_BYTES`（默认 32 MiB / 33554432 字节 UTF-8），超出回 `too_large`，且不会广播给对端。
+- 接受 text 与 binary frame，载荷对服务器都是不透明的（不解析应用层信封）。
+- 单条 ≤ `MAX_MESSAGE_BYTES`（默认 32 MiB / 33554432 字节；text 按 UTF-8 字节数计，binary 按原始字节数计），超出回 `too_large`，且不会广播给对端。
 - 每条连接 ≤ 20 条/秒；整个房间另有 **4 MiB/s** 的滑动窗口字节预算。超出回 `rate_limited`，不会广播。
-- 同一连接累计 **3** 次 `too_large` / `rate_limited`（含房间预算）/ `bad_request` 违规后，服务端关闭该连接（1008），而不是只回错误却一直占着槽位。
+- 同一连接累计 **3** 次 `too_large` / `rate_limited`（含房间预算）违规后，服务端关闭该连接（1008），而不是只回错误却一直占着槽位。
 
 `MAX_MESSAGE_BYTES` 是十进制字节数，写在 `wrangler.toml` 的 `[vars]` 里。未设置或不是正整数时，默认 `33554432`（32 MiB），与 [Durable Objects 入站 WebSocket 消息上限](https://developers.cloudflare.com/durable-objects/platform/limits/) 一致（文档更新于 2026-11-07，只限制收到的消息）。配置大于该上限时会被钳到 `33554432`。要收紧单条消息，把这个变量改小即可。
 
@@ -58,7 +57,6 @@
 - **无离线投递**：零存储，不在线的客户端收不到；后上线设备靠 `peer_joined` 触发对端重发缓存
 - **无身份认证**：`rid` 就是全部凭证，安全性依赖 `rid` 的保密性 + 客户端加密
 - **不做应用协议**：不解密、不识别剪贴板、不内置隧道（例如 Chisel 只应出现在客户端出网路径上）
-- **暂不接受二进制帧**（当前 MVP）
 
 ## 日志与可观测性
 
@@ -89,7 +87,7 @@ npm run gen:vectors    # 重新生成 test-vectors/vectors.json
 
 `test-vectors/vectors.json` 是客户端与服务端对齐用的加解密基准向量
 （Argon2id 派生 + HKDF 展开 + AES-256-GCM 封包）。任何客户端实现都应当通过这些向量。
-应用层信封格式由客户端仓库定义，本 Worker 只转发 text frame。
+应用层信封格式由客户端仓库定义，本 Worker 只转发 text/binary frame。
 
 ## 许可
 

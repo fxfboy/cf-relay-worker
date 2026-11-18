@@ -18,6 +18,20 @@ export function nextMessage(ws: WebSocket, timeoutMs = 2000): Promise<string> {
   });
 }
 
+export function nextBinaryMessage(ws: WebSocket, timeoutMs = 2000): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error("timeout waiting for binary message")), timeoutMs);
+    ws.addEventListener("message", (e) => {
+      clearTimeout(timer);
+      if (!(e.data instanceof ArrayBuffer)) {
+        reject(new Error(`expected binary frame, got ${typeof e.data}`));
+        return;
+      }
+      resolve(e.data);
+    }, { once: true });
+  });
+}
+
 export function nextClose(ws: WebSocket, timeoutMs = 2000): Promise<{ code: number; reason: string }> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("timeout waiting for close")), timeoutMs);
