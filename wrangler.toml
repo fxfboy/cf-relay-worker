@@ -28,6 +28,8 @@ new_sqlite_classes = ["Room"]
 [vars]
 MAX_MESSAGE_BYTES = "33554432"
 
+# invocation_logs 会记录请求头(含 Sec-WebSocket-Protocol / X-Relay-Room),
+# 其中带有房间 id,因此关闭。应用日志里也不要打印这些字段。
 [observability.logs]
 enabled = true
-invocation_logs = true
+invocation_logs = false

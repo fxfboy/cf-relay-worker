@@ -8,7 +8,15 @@ export const CF_RECEIVED_WS_MESSAGE_BYTES = 32 * 1024 * 1024;
 /** 未设置或非法的 MAX_MESSAGE_BYTES 时使用，与平台入站上限相同。 */
 export const DEFAULT_MAX_MESSAGE_BYTES = CF_RECEIVED_WS_MESSAGE_BYTES;
 export const MAX_MSG_PER_SEC = 20;
-export const MAX_CONNECTIONS = 8;
+export const MAX_CONNECTIONS = 16;
+/** Sliding 1s window, shared by every connection in the room. */
+export const MAX_ROOM_BYTES_PER_SEC = 4 * 1024 * 1024; // 4 MiB/s
+/** After this many too_large / rate_limited / budget violations, the socket is closed. */
+export const MAX_VIOLATIONS = 3;
+
+export const SUBPROTOCOL = "cf-relay-v1";
+export const RID_PROTOCOL_PREFIX = "rid.";
+export const ROOM_HEADER = "X-Relay-Room";
 
 /**
  * 解析单条文本帧的字节上限。
@@ -42,4 +50,12 @@ export function controlError(code: ControlCode, detail?: string): string {
   const msg: { control: "error"; code: ControlCode; detail?: string } = { control: "error", code };
   if (detail !== undefined) msg.detail = detail;
   return JSON.stringify(msg);
+}
+
+export function controlHello(): string {
+  return JSON.stringify({ control: "hello", v: PROTOCOL_VERSION });
+}
+
+export function controlPeerJoined(peers: number): string {
+  return JSON.stringify({ control: "peer_joined", peers });
 }
