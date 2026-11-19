@@ -68,6 +68,7 @@
 npm install
 npm run dev            # 本地 wrangler dev
 npm test               # vitest（在 workerd 内运行）
+npm run e2e            # 对已部署环境跑线上 E2E（host 用参数或 E2E_HOST 传入）
 npm run gen:vectors    # 重新生成 test-vectors/vectors.json
 ```
 

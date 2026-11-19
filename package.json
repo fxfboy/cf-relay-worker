@@ -8,6 +8,7 @@
     "deploy": "wrangler deploy",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "e2e": "node tools/e2e.mjs",
     "gen:vectors": "node tools/generate-vectors.mjs"
   },
   "devDependencies": {
